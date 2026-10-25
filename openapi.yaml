@@ -1,0 +1,209 @@
+openapi: 3.1.0
+info:
+  title: Layanan Manajemen Stok Tahu Tempe
+  version: 1.0.0
+  description: REST API manajemen produk dan stok tahu/tempe untuk usaha keluarga (Kelompok Anti-Normal)
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Server lokal development
+paths:
+  /produk:
+    get:
+      operationId: listProduk
+      summary: Daftar semua produk tahu dan tempe
+      tags:
+        - Produk
+      responses:
+        '200':
+          description: Daftar produk berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Produk'
+    post:
+      operationId: tambahProduk
+      summary: Menambahkan produk baru ke dalam stok
+      tags:
+        - Produk
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProdukInput'
+      responses:
+        '201':
+          description: Produk berhasil dibuat
+          headers:
+            Location:
+              schema:
+                type: string
+              description: URL lokasi produk yang baru dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Produk'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /produk/{kode_produk}:
+    get:
+      operationId: detailProduk
+      summary: Menampilkan detail satu produk berdasarkan kode produk
+      tags:
+        - Produk
+      parameters:
+        - name: kode_produk
+          in: path
+          required: true
+          schema:
+            type: string
+          example: TAHU-001
+      responses:
+        '200':
+          description: Detail produk
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Produk'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /produk/{kode_produk}/penyesuaian-stok:
+    post:
+      operationId: sesuaikanStok
+      summary: Menyesuaikan stok produk (penjualan, restok, koreksi)
+      tags:
+        - Stok
+      parameters:
+        - name: kode_produk
+          in: path
+          required: true
+          schema:
+            type: string
+          example: TAHU-001
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StokInput'
+      responses:
+        '200':
+          description: Stok berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Produk'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+components:
+  schemas:
+    Produk:
+      type: object
+      required:
+        - kode_produk
+        - nama_produk
+        - jenis_produk
+        - harga_satuan
+        - jumlah_stok
+      properties:
+        kode_produk:
+          type: string
+          example: TAHU-001
+        nama_produk:
+          type: string
+          example: Tahu Putih
+        jenis_produk:
+          type: string
+          enum: [tahu, tempe]
+          example: tahu
+        harga_satuan:
+          type: integer
+          example: 5000
+        jumlah_stok:
+          type: integer
+          example: 100
+        terakhir_diperbarui:
+          type: string
+          format: date-time
+          example: "2026-10-25T10:00:00Z"
+        tersedia:
+          type: boolean
+          example: true
+    ProdukInput:
+      type: object
+      required:
+        - nama_produk
+        - jenis_produk
+        - harga_satuan
+        - stok_awal
+      properties:
+        nama_produk:
+          type: string
+          example: Tahu Putih
+        jenis_produk:
+          type: string
+          enum: [tahu, tempe]
+          example: tahu
+        harga_satuan:
+          type: integer
+          example: 5000
+        stok_awal:
+          type: integer
+          example: 100
+    StokInput:
+      type: object
+      required:
+        - jenis_penyesuaian
+        - jumlah
+      properties:
+        jenis_penyesuaian:
+          type: string
+          enum: [penjualan, restok, koreksi]
+          example: penjualan
+        jumlah:
+          type: integer
+          example: 5
+    Problem:
+      type: object
+      required:
+        - type
+        - title
+        - status
+      properties:
+        type:
+          type: string
+          example: https://localhost:8000/api/v1/problems/not-found
+        title:
+          type: string
+          example: Produk tidak ditemukan
+        status:
+          type: integer
+          example: 404
+        detail:
+          type: string
+          example: Produk dengan kode TAHU-999 tidak ditemukan.
+  responses:
+    NotFound:
+      description: Produk tidak ditemukan
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Conflict:
+      description: Stok tidak cukup untuk penjualan
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Unprocessable:
+      description: Validasi permintaan gagal
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
