@@ -23,5 +23,5 @@ Mata kuliah: Integrasi Cloud — UTS Kelompok **Anti-Normal**.
 
 ### 1. Clone repositori
 ```bash
-git clone <url-repo-kelompok>
+git clone https://github.com/chepi-dev/UTS_Integrasi.git
 cd stok-tempe
