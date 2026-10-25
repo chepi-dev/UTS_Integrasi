@@ -3,6 +3,9 @@ info:
   title: Layanan Manajemen Stok Tahu Tempe
   version: 1.0.0
   description: REST API manajemen produk dan stok tahu/tempe untuk usaha keluarga (Kelompok Anti-Normal)
+  contact:
+    name: Kelompok Anti-Normal
+    email: kelompok.antinormal@example.com
 servers:
   - url: http://localhost:8000/api/v1
     description: Server lokal development
@@ -11,6 +14,7 @@ paths:
     get:
       operationId: listProduk
       summary: Daftar semua produk tahu dan tempe
+      description: Mengembalikan daftar lengkap semua produk tahu dan tempe yang tersedia dalam stok.
       tags:
         - Produk
       responses:
@@ -25,6 +29,7 @@ paths:
     post:
       operationId: tambahProduk
       summary: Menambahkan produk baru ke dalam stok
+      description: Mengembalikan daftar lengkap semua produk tahu dan tempe yang tersedia dalam stok.
       tags:
         - Produk
       requestBody:
@@ -51,6 +56,7 @@ paths:
     get:
       operationId: detailProduk
       summary: Menampilkan detail satu produk berdasarkan kode produk
+      description: Mengembalikan daftar lengkap semua produk tahu dan tempe yang tersedia dalam stok.
       tags:
         - Produk
       parameters:
@@ -73,6 +79,7 @@ paths:
     post:
       operationId: sesuaikanStok
       summary: Menyesuaikan stok produk (penjualan, restok, koreksi)
+      description: Mengembalikan daftar lengkap semua produk tahu dan tempe yang tersedia dalam stok.
       tags:
         - Stok
       parameters:
@@ -207,3 +214,8 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Problem'
+tags:
+  - name: Produk
+    description: Operasi manajemen produk tahu dan tempe
+  - name: Stok
+    description: Operasi penyesuaian stok
